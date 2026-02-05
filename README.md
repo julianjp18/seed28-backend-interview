@@ -2,6 +2,14 @@
 
 Backend API for Bulltrack Pro, an advanced bovine genetic ranking platform.
 
+## 🌐 Demo
+
+- **Frontend:** [https://seed28-frontend-interview.onrender.com](https://seed28-frontend-interview.onrender.com)
+- **Backend API:** [https://seed28-backend-interview.onrender.com](https://seed28-backend-interview.onrender.com)
+- **Database:** Hosted on [Neon](https://neon.tech) (PostgreSQL).
+
+Default credentials: `admin@seed28.com` / `seed28`
+
 ## 🛠️ Tech Stack
 
 - **Framework:** NestJS 10+
