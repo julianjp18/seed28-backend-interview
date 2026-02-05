@@ -1,89 +1,89 @@
 # 🐂 Bulltrack Pro - Backend API
 
-Backend API para Bulltrack Pro, una plataforma avanzada de ranking genético bovino.
+Backend API for Bulltrack Pro, an advanced bovine genetic ranking platform.
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Tech Stack
 
 - **Framework:** NestJS 10+
-- **Base de Datos:** PostgreSQL
+- **Database:** PostgreSQL
 - **ORM:** TypeORM
-- **Autenticación:** JWT (Passport)
-- **Validación:** class-validator, class-transformer
+- **Authentication:** JWT (Passport)
+- **Validation:** class-validator, class-transformer
 
-## 📋 Prerrequisitos
+## 📋 Prerequisites
 
 - Node.js 18+
-- PostgreSQL (p. ej. Neon) y su connection string
-- npm o yarn
+- PostgreSQL (e.g. Neon) and its connection string
+- npm or yarn
 
-## 🚀 Instalación y Configuración
+## 🚀 Installation and Setup
 
-### 1. Instalar dependencias
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Configurar variables de entorno
+### 2. Configure environment variables
 
-Copia el archivo `env.example` a `.env` y configura las variables:
+Copy the `env.example` file to `.env` and set the variables:
 
 ```bash
 cp env.example .env
 ```
 
-Edita `.env` con tus credenciales:
+Edit `.env` with your credentials:
 
 ```env
 DATABASE_URL=postgresql://user:password@host/database?sslmode=require
-JWT_SECRET=tu-secret-key-muy-seguro-minimo-32-caracteres
+JWT_SECRET=your-very-secure-secret-key-minimum-32-characters
 JWT_EXPIRES_IN=24h
 PORT=3001
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
 ```
 
-La conexión a la base de datos es únicamente por **connection string** (`DATABASE_URL`).
+Database connection is **connection string only** (`DATABASE_URL`).
 
-### 3. Crear la base de datos
+### 3. Create the database
 
-Crea el proyecto y la base en tu proveedor (ej. Neon), copia la connection string y asígnala a `DATABASE_URL` en `.env`.
+Create the project and database in your provider (e.g. Neon), copy the connection string and set it as `DATABASE_URL` in `.env`.
 
-### 4. Ejecutar migraciones (si las hay)
+### 4. Run migrations (if any)
 
 ```bash
 npm run migration:run
 ```
 
-### 5. Poblar la base de datos con datos iniciales
+### 5. Seed the database with initial data
 
 ```bash
 npm run seed:run
 ```
 
-Esto creará:
-- Usuario por defecto: `admin@seed28.com` / `seed28`
-- 7 toros de ejemplo
+This will create:
+- Default user: `admin@seed28.com` / `seed28`
+- 7 sample bulls
 
-### 6. Iniciar el servidor
+### 6. Start the server
 
 ```bash
-# Desarrollo (con hot-reload)
+# Development (with hot-reload)
 npm run start:dev
 
-# Producción
+# Production
 npm run build
 npm run start:prod
 ```
 
-El servidor estará disponible en `http://localhost:3001`
+The server will be available at `http://localhost:3001`
 
-## 📚 Endpoints de la API
+## 📚 API Endpoints
 
-### Autenticación
+### Authentication
 
 #### `POST /api/auth/login`
-Autenticación de usuario.
+User authentication.
 
 **Body:**
 ```json
@@ -105,10 +105,10 @@ Autenticación de usuario.
 }
 ```
 
-### Toros
+### Bulls
 
 #### `GET /api/bulls`
-Lista todos los toros con filtros, paginación y ordenamiento.
+List all bulls with filters, pagination and sorting.
 
 **Query Parameters:**
 - `search` (string, optional): Search by ear tag or name
@@ -157,142 +157,141 @@ Authorization: Bearer <token>
 ```
 
 #### `GET /api/bulls/:id`
-Obtiene un toro específico por ID.
+Get a specific bull by ID.
 
 #### `GET /api/bulls/favorites`
-Lista los toros favoritos del usuario autenticado (con los mismos filtros de query).
+List the authenticated user's favorite bulls (with the same query filters).
 
 #### `POST /api/bulls/:id/favorite`
-Agrega un toro a favoritos.
+Add a bull to favorites.
 
 #### `DELETE /api/bulls/:id/favorite`
-Elimina un toro de favoritos.
+Remove a bull from favorites.
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
-### Estructura de Módulos
+### Module Structure
 
 ```
 src/
-├── auth/           # Autenticación JWT
-├── users/          # Gestión de usuarios
-├── bulls/          # Gestión de toros y favoritos
-├── common/         # Código compartido (decorators, guards, filters)
-└── database/       # Configuración DB, seeds, migraciones
+├── auth/           # JWT authentication
+├── users/          # User management
+├── bulls/          # Bulls and favorites management
+├── common/         # Shared code (decorators, guards, filters)
+└── database/       # DB config, seeds, migrations
 ```
 
-### Características Principales
+### Main Features
 
-1. **Separación por Módulos:** Cada funcionalidad está encapsulada en su propio módulo
-2. **Repositorios Personalizados:** Lógica de consultas complejas en `BullsRepository`
-3. **DTOs para Validación:** Validación automática de datos de entrada
-4. **Guards y Decoradores:** Autenticación y autorización reutilizables
-5. **Cálculo Dinámico de Bull Score:** Se calcula en tiempo real usando la fórmula:
+1. **Module Separation:** Each feature is encapsulated in its own module
+2. **Custom Repositories:** Complex query logic in `BullsRepository`
+3. **DTOs for Validation:** Automatic validation of input data
+4. **Guards and Decorators:** Reusable authentication and authorization
+5. **Dynamic Bull Score Calculation:** Computed in real time using the formula:
    ```
    bullScore = (C × 0.30) + (F × 0.25) + (R × 0.20) + (M × 0.15) + (Ca × 0.10)
    ```
 
-### Base de Datos
+### Database
 
-#### Esquema Principal
+#### Main Schema
 
-- **users:** Usuarios del sistema
-- **bulls:** Información de toros
-- **favorites:** Relación many-to-many entre usuarios y toros
+- **users:** System users
+- **bulls:** Bull information
+- **favorites:** Many-to-many relationship between users and bulls
 
-#### Índices
+#### Indexes
 
-Se han creado índices en:
-- `bulls.ear_tag` (búsqueda)
-- `bulls.origin` (filtrado)
-- `bulls.coat` (filtrado)
-- `bulls.use_type` (filtrado)
-- `favorites.userId` y `favorites.bullId` (consultas de favoritos)
+Indexes have been created on:
+- `bulls.ear_tag` (search)
+- `bulls.origin` (filtering)
+- `bulls.coat` (filtering)
+- `bulls.use_type` (filtering)
+- `favorites.userId` and `favorites.bullId` (favorites queries)
 
 ## 🧪 Testing
 
-### Tests unitarios
+### Unit tests
 
-Tests con mocks para servicios y controladores (no requieren base de datos):
+Tests with mocks for services and controllers (no database required):
 
-- **Auth:** `auth.service.spec.ts`, `auth.controller.spec.ts` — login, credenciales inválidas, errores inesperados.
-- **Bulls:** `bulls.service.spec.ts`, `bulls.controller.spec.ts` — listado, detalle, favoritos, `NotFoundException`.
+- **Auth:** `auth.service.spec.ts`, `auth.controller.spec.ts` — login, invalid credentials, unexpected errors.
+- **Bulls:** `bulls.service.spec.ts`, `bulls.controller.spec.ts` — list, detail, favorites, `NotFoundException`.
 
 ```bash
-# Ejecutar todos los tests unitarios
+# Run all unit tests
 npm run test
 
-# Con cobertura
+# With coverage
 npm run test:cov
 
-# En modo watch
+# Watch mode
 npm run test:watch
 ```
 
-### Tests e2e
+### E2E tests
 
-Los tests e2e (`test/app.e2e-spec.ts`) levantan la aplicación real y requieren **PostgreSQL** y `DATABASE_URL` en `.env` (por ejemplo, una base de pruebas). Verifican:
+E2E tests (`test/app.e2e-spec.ts`) spin up the real application and require **PostgreSQL** and `DATABASE_URL` in `.env` (e.g. a test database). They verify:
 
-- `POST /api/auth/login` — 401 con credenciales inválidas, 400 con body inválido.
-- `GET /api/bulls` — 401 sin token.
+- `POST /api/auth/login` — 401 with invalid credentials, 400 with invalid body.
+- `GET /api/bulls` — 401 without token.
 
 ```bash
-# Requiere DATABASE_URL configurado
+# Requires DATABASE_URL to be configured
 npm run test:e2e
 ```
 
-## 🔒 Seguridad
+## 🔒 Security
 
-- Autenticación JWT obligatoria para todas las rutas (excepto login)
-- Validación de datos de entrada con `class-validator`
-- Passwords hasheados con bcrypt
-- CORS configurado para el frontend
+- JWT authentication required for all routes (except login)
+- Input validation with `class-validator`
+- Passwords hashed with bcrypt
+- CORS configured for the frontend
 
-## 📈 Escalabilidad
+## 📈 Scalability
 
-El sistema está diseñado para escalar:
+The system is designed to scale:
 
-- **Paginación del lado del servidor:** No carga todos los registros en memoria
-- **Índices en base de datos:** Consultas optimizadas para filtros frecuentes
-- **Cálculo de score en la query:** Eficiente para grandes volúmenes
-- **Repositorios personalizados:** Fácil optimizar consultas específicas
+- **Server-side pagination:** Does not load all records into memory
+- **Database indexes:** Optimized queries for frequent filters
+- **Score calculation in the query:** Efficient for large volumes
+- **Custom repositories:** Easy to optimize specific queries
 
-### Consideraciones para 100,000+ registros
+### Considerations for 100,000+ records
 
-- Agregar índices compuestos según patrones de consulta
-- Implementar caché (Redis) para consultas frecuentes
-- Considerar particionamiento de tablas si es necesario
-- Optimizar queries con `EXPLAIN ANALYZE`
+- Add composite indexes based on query patterns
+- Implement cache (Redis) for frequent queries
+- Consider table partitioning if needed
+- Optimize queries with `EXPLAIN ANALYZE`
 
-## 🚀 Mejoras Futuras
+## 🚀 Future Improvements
 
-Si tuviera 2 semanas más, implementaría:
+With 2 more weeks, I would implement:
 
-1. **Caché:** Redis para consultas frecuentes y reducir carga en DB
-2. **Ampliar tests:** E2E con DB de test, tests del repositorio y de UsersService
-3. **Documentación API:** Swagger/OpenAPI con decoradores NestJS
-4. **Logging estructurado:** Winston o Pino con niveles y contexto
-5. **Rate Limiting:** Protección contra abuso de API
-6. **WebSockets:** Notificaciones en tiempo real para favoritos
-7. **Búsqueda avanzada:** Full-text search con PostgreSQL o Elasticsearch
-8. **Exportación de datos:** CSV/Excel para reportes
-9. **Auditoría:** Logs de cambios en datos críticos
-10. **Health checks:** Endpoints para monitoreo y alertas
+1. **Cache:** Redis for frequent queries and reduced DB load
+2. **Expand tests:** E2E with test DB, repository and UsersService tests
+3. **API documentation:** Swagger/OpenAPI with NestJS decorators
+4. **Structured logging:** Winston or Pino with levels and context
+5. **Rate limiting:** API abuse protection
+6. **WebSockets:** Real-time notifications for favorites
+7. **Advanced search:** Full-text search with PostgreSQL or Elasticsearch
+8. **Data export:** CSV/Excel for reports
+9. **Audit:** Logs for changes to critical data
+10. **Health checks:** Endpoints for monitoring and alerts
 
-## 📝 Scripts Disponibles
+## 📝 Available Scripts
 
-- `npm run start:dev` - Desarrollo con hot-reload
-- `npm run build` - Compilar para producción
-- `npm run start:prod` - Ejecutar versión compilada
-- `npm run seed:run` - Ejecutar seeds de datos iniciales
-- `npm run test` - Ejecutar tests
+- `npm run start:dev` - Development with hot-reload
+- `npm run build` - Build for production
+- `npm run start:prod` - Run compiled version
+- `npm run seed:run` - Run initial data seeds
+- `npm run test` - Run tests
 - `npm run lint` - Linter
 
-## 🤝 Contribución
+## 🤝 Contributing
 
-Este es un proyecto de challenge técnico para Seed28.
+This is a technical challenge project for Seed28.
 
-## 📄 Licencia
+## 📄 License
 
 MIT
-# seed28-interview
