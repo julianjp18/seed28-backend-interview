@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Bulltrack Pro API",
+    "description": "Colección para la API del backend Bulltrack Pro (Seed28).\n\n1. Ejecutar **Auth > Login** con `admin@seed28.com` / `seed28`.\n2. El token se guarda en la variable de colección `access_token`.\n3. El resto de endpoints usan Bearer token automáticamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "access_token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{access_token}}" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.access_token) {",
+                  "        pm.collectionVariables.set('access_token', json.access_token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@seed28.com\",\n  \"password\": \"seed28\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Autenticación. Body: email, password. Guarda `access_token` en la variable de colección."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bulls",
+      "item": [
+        {
+          "name": "List bulls",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bulls?page=1&limit=10&sortBy=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bulls"],
+              "query": [
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "origin", "value": "propio", "disabled": true },
+                { "key": "forHeifer", "value": "false", "disabled": true },
+                { "key": "coat", "value": "negro", "disabled": true },
+                { "key": "sortBy", "value": "desc" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Lista toros con filtros y paginación. Query: search, origin (propio|catalogo|favoritos), forHeifer, coat (negro|colorado), sortBy (asc|desc), page, limit."
+          }
+        },
+        {
+          "name": "Get favorites",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bulls/favorites?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bulls", "favorites"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Lista los toros favoritos del usuario autenticado. Mismos query params que List bulls."
+          }
+        },
+        {
+          "name": "Get bull by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bulls/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bulls", "1"]
+            },
+            "description": "Obtiene un toro por ID. Reemplaza 1 por el ID deseado."
+          }
+        },
+        {
+          "name": "Add favorite",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bulls/1/favorite",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bulls", "1", "favorite"]
+            },
+            "description": "Agrega el toro con ID dado a favoritos del usuario. Reemplaza 1 por el bullId."
+          }
+        },
+        {
+          "name": "Remove favorite",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/bulls/1/favorite",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "bulls", "1", "favorite"]
+            },
+            "description": "Quita el toro con ID dado de favoritos. Reemplaza 1 por el bullId."
+          }
+        }
+      ]
+    }
+  ]
+}
