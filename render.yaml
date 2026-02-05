@@ -1,0 +1,12 @@
+# Render Blueprint for Bulltrack Pro Backend
+# Ensures devDependencies (e.g. @nestjs/cli) are installed for the build step
+services:
+  - type: web
+    name: bulltrack-backend
+    runtime: node
+    # Install devDependencies so "nest build" works, then build
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
